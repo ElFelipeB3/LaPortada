@@ -143,60 +143,6 @@
             color: #FFFFFF !important;
         }
 
-        /* HERO AJUSTADO SIN RECORTES */
-        .hero-video-container {
-            position: relative;
-            width: 100%;
-            min-height: 100vh;
-            min-height: 100svh;
-            overflow: hidden;
-            background-color: #0D0907;
-        }
-
-        /* Capa de video difuminado de fondo para móvil */
-        .hero-video-blur {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: blur(28px) brightness(0.5);
-            transform: scale(1.15);
-            z-index: 1;
-        }
-
-        /* Video principal visible */
-        .hero-video-main {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* En móvil se ve 100% completo sin recortes laterales */
-            object-position: center center;
-            z-index: 2;
-            filter: contrast(1.05) brightness(0.98);
-        }
-
-        /* En pantallas medianas y de escritorio, cubre toda la pantalla panorámica */
-        @media (min-width: 768px) {
-            .hero-video-blur {
-                display: none;
-            }
-            .hero-video-main {
-                object-fit: cover;
-            }
-        }
-
-        .hero-lighting-overlay {
-            position: absolute;
-            inset: 0;
-            background: 
-                linear-gradient(180deg, rgba(13, 9, 7, 0.75) 0%, rgba(13, 9, 7, 0.15) 25%, rgba(13, 9, 7, 0.25) 70%, rgba(13, 9, 7, 0.95) 100%),
-                radial-gradient(circle at 50% 50%, transparent 35%, rgba(13, 9, 7, 0.4) 80%, rgba(13, 9, 7, 0.9) 100%);
-            z-index: 3;
-            pointer-events: none;
-        }
-
         .glass-clean {
             background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(12px);
@@ -308,45 +254,50 @@
         <a href="#contacto" class="mobile-link block px-4 py-3 rounded-2xl font-semibold text-stone-700 dark:text-stone-300 text-sm"><i class="fa-solid fa-location-dot mr-2 text-amber-600"></i> Ubicación</a>
     </div>
 
-    <!-- HERO SECTION SIN RECORTE -->
-    <section id="inicio" class="hero-video-container flex flex-col justify-between items-center px-4 sm:px-6 lg:px-8">
+    <!-- =========================================================
+         HERO SECTION: RESPONSIVO DUAL (TARJETA NATURAL EN MÓVIL, FULLSCREEN EN PC)
+         ========================================================= -->
+    <section id="inicio" class="relative w-full md:h-screen md:min-h-[700px] flex flex-col justify-between items-center pt-28 pb-12 md:pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden bg-stone-950">
         
-        <!-- Video desenfocado de fondo (llena los bordes en móviles de forma estética) -->
-        <video autoplay muted loop playsinline class="hero-video-blur" aria-hidden="true">
+        <!-- VIDEO EN ESCRITORIO (Full background nativo) -->
+        <video autoplay muted loop playsinline class="hidden md:block absolute inset-0 w-full h-full object-cover filter contrast-[1.05] brightness-[0.96] z-[1]">
             <source src="inicio.mp4" type="video/mp4">
         </video>
 
-        <!-- Video frontal con encuadre completo -->
-        <video autoplay muted loop playsinline class="hero-video-main">
-            <source src="inicio.mp4" type="video/mp4">
-            Tu navegador no soporta videos HTML5.
-        </video>
+        <!-- SOMBRAS Y GRADIENTE CINEMATOGRÁFICO EN ESCRITORIO -->
+        <div class="hidden md:block absolute inset-0 bg-gradient-to-b from-[#0D0907]/75 via-transparent to-[#0D0907]/90 z-[2] pointer-events-none"></div>
 
-        <div class="hero-lighting-overlay"></div>
-
-        <!-- Parte Superior: Badge Flotante -->
-        <div class="relative z-10 text-center pt-24 sm:pt-32">
+        <!-- 1. Parte Superior: Badge de Tradición -->
+        <div class="relative z-10 text-center mb-6 md:mb-0">
             <div class="inline-flex items-center gap-2 px-5 py-2 sm:px-6 sm:py-2.5 rounded-full bg-black/60 border border-amber-400/50 text-amber-200 text-xs sm:text-sm font-bold uppercase tracking-wider sm:tracking-widest backdrop-blur-md shadow-2xl">
                 <i class="fa-solid fa-wheat-awn text-amber-400"></i> San José del Guaviare • Tradición & Sabor
             </div>
         </div>
 
-        <!-- CENTRO DESPEJADO PARA VISUALIZACIÓN COMPLETA -->
-        <div class="relative z-10 w-full min-h-[140px] sm:min-h-[220px] flex-grow pointer-events-none"></div>
+        <!-- 2. VIDEO EN MÓVIL (Tarjeta enmarcada 16:9 natural, sin deformaciones ni recortes) -->
+        <div class="md:hidden relative z-10 w-full max-w-md mx-auto my-4 rounded-3xl overflow-hidden border-2 border-amber-500/40 shadow-2xl bg-black aspect-video flex items-center justify-center">
+            <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                <source src="inicio.mp4" type="video/mp4">
+                Tu navegador no soporta videos HTML5.
+            </video>
+        </div>
 
-        <!-- Parte Inferior: Botones -->
-        <div class="relative z-10 w-full max-w-3xl text-center pb-8 sm:pb-14">
+        <!-- ESPACIADOR FLEXIBLE PARA ESCRITORIO (Mantiene el centro libre para el logo/animación) -->
+        <div class="hidden md:block relative z-10 w-full flex-grow pointer-events-none"></div>
+
+        <!-- 3. Parte Inferior: Botones de Acción -->
+        <div class="relative z-10 w-full max-w-3xl text-center mt-4 md:mt-0">
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 px-2">
                 
                 <a href="#carta" class="w-full sm:w-auto bg-gradient-to-r from-brand-red via-orange-500 to-amber-500 hover:from-brand-darkRed hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider px-7 py-3.5 sm:px-8 sm:py-4 rounded-full shadow-2xl shadow-brand-red/60 transition-all transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2 border border-amber-300/40">
                     <i class="fa-solid fa-utensils text-yellow-200"></i> Ver Menú
                 </a>
                 
-                <a href="#eventos" class="w-full sm:w-auto bg-black/65 hover:bg-black/90 text-white border-2 border-amber-400/80 hover:border-amber-300 font-bold text-xs sm:text-sm uppercase tracking-wider px-7 py-3.5 sm:px-8 sm:py-4 rounded-full backdrop-blur-md transition-all transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2 shadow-xl">
+                <a href="#eventos" class="w-full sm:w-auto bg-black/75 hover:bg-black/90 text-white border-2 border-amber-400/80 hover:border-amber-300 font-bold text-xs sm:text-sm uppercase tracking-wider px-7 py-3.5 sm:px-8 sm:py-4 rounded-full backdrop-blur-md transition-all transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2 shadow-xl">
                     <i class="fa-solid fa-cake-candles text-amber-400"></i> Eventos y Pedidos
                 </a>
                 
-                <a href="#contacto" class="w-full sm:w-auto bg-black/65 hover:bg-black/90 text-white border-2 border-amber-400/80 hover:border-amber-300 font-bold text-xs sm:text-sm uppercase tracking-wider px-7 py-3.5 sm:px-8 sm:py-4 rounded-full backdrop-blur-md transition-all transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2 shadow-xl">
+                <a href="#contacto" class="w-full sm:w-auto bg-black/75 hover:bg-black/90 text-white border-2 border-amber-400/80 hover:border-amber-300 font-bold text-xs sm:text-sm uppercase tracking-wider px-7 py-3.5 sm:px-8 sm:py-4 rounded-full backdrop-blur-md transition-all transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2 shadow-xl">
                     <i class="fa-solid fa-location-dot text-amber-400"></i> Ubicación
                 </a>
 
@@ -639,7 +590,6 @@
                     </p>
 
                     <div class="space-y-4 mb-8">
-                        <!-- Llamada Telefónica -->
                         <a href="tel:+573213294659" class="flex items-center gap-4 p-4 rounded-2xl glass-clean hover:scale-[1.02] transition-all group block">
                             <div class="w-12 h-12 rounded-xl bg-brand-red/15 text-brand-red group-hover:bg-brand-red group-hover:text-white transition-colors flex items-center justify-center text-xl">
                                 <i class="fa-solid fa-phone"></i>
@@ -677,7 +627,6 @@
                     </a>
                 </div>
 
-                <!-- MAPA TOPOGRÁFICO EN COLOR CON RELIEVE -->
                 <div class="lg:col-span-6">
                     <div class="rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-500/30 dark:border-amber-500/20 h-[440px] relative bg-stone-100 dark:bg-stone-900">
                         <div id="map" class="w-full h-full z-10"></div>
