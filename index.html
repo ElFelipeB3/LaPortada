@@ -1,0 +1,912 @@
+﻿<!DOCTYPE html>
+<html lang="es" class="scroll-smooth" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Portada | Panadería, Heladería, Asadero & Eventos</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            red: '#D92323',
+                            darkRed: '#991515',
+                            gold: '#F59E0B',
+                            lightGold: '#FDE68A',
+                            warmBread: '#E6A15C',
+                            crust: '#8C4318',
+                            cream: '#FFFDF9',
+                            darkBg: '#0D0907',
+                            darkSurface: '#16100B',
+                            darkCard: '#20160F'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        script: ['Dancing Script', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:ital,wght@0,600;0,800;0,900;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        .page-bakery-bg {
+            background-color: #FFFDF8;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(245, 158, 11, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 85% 65%, rgba(217, 35, 35, 0.05) 0%, transparent 45%),
+                url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d97706' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M20 20c3 0 6 2 6 5s-3 5-6 5-6-2-6-5 3-5 6-5zm40 40c3 0 6 2 6 5s-3 5-6 5-6-2-6-5 3-5 6-5zm-30 8c1.5 0 3 .8 3 2s-1.5 2-3 2-3-.8-3-2 1.5-2 3-2zm20-36c1.5 0 3 .8 3 2s-1.5 2-3 2-3-.8-3-2 1.5-2 3-2zM56 16c2 0 4 1.5 4 3.5S58 23 56 23s-4-1.5-4-3.5 2-3.5 4-3.5zM16 56c2 0 4 1.5 4 3.5S18 63 16 63s-4-1.5-4-3.5 2-3.5 4-3.5z'/%3E%3C/g%3E%3C/svg%3E");
+            background-attachment: fixed;
+        }
+
+        .dark .page-bakery-bg {
+            background-color: #0E0907;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(245, 158, 11, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 85% 65%, rgba(217, 35, 35, 0.06) 0%, transparent 45%),
+                url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f59e0b' fill-opacity='0.04' fill-rule='evenodd'%3E%3Cpath d='M20 20c3 0 6 2 6 5s-3 5-6 5-6-2-6-5 3-5 6-5zm40 40c3 0 6 2 6 5s-3 5-6 5-6-2-6-5 3-5 6-5zm-30 8c1.5 0 3 .8 3 2s-1.5 2-3 2-3-.8-3-2 1.5-2 3-2zm20-36c1.5 0 3 .8 3 2s-1.5 2-3 2-3-.8-3-2 1.5-2 3-2zM56 16c2 0 4 1.5 4 3.5S58 23 56 23s-4-1.5-4-3.5 2-3.5 4-3.5zM16 56c2 0 4 1.5 4 3.5S18 63 16 63s-4-1.5-4-3.5 2-3.5 4-3.5z'/%3E%3C/g%3E%3C/svg%3E");
+            background-attachment: fixed;
+        }
+
+        .bread-navbar-wrapper {
+            position: fixed;
+            top: 14px;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            padding: 0 16px;
+            pointer-events: none;
+        }
+
+        .bread-navbar {
+            pointer-events: auto;
+            width: min(1020px, 100%);
+            height: 64px;
+            border-radius: 50px 35px 50px 35px;
+            padding: 0 16px 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            transition: background 0.3s ease, border-color 0.3s ease;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transform: translateZ(0);
+        }
+
+        html:not(.dark) .bread-navbar {
+            background: linear-gradient(135deg, rgba(255, 248, 235, 0.96) 0%, rgba(254, 235, 195, 0.94) 50%, rgba(245, 185, 95, 0.92) 100%);
+            border: 2px solid #D97706;
+            box-shadow: 0 10px 30px rgba(180, 83, 9, 0.15), inset 0 2px 2px rgba(255, 255, 255, 0.9);
+        }
+
+        html.dark .bread-navbar {
+            background: linear-gradient(135deg, rgba(38, 24, 15, 0.96) 0%, rgba(24, 14, 9, 0.97) 50%, rgba(15, 9, 6, 0.98) 100%);
+            border: 2px solid rgba(245, 158, 11, 0.55);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.65), inset 0 1px 2px rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-link-bread {
+            position: relative;
+            padding: 8px 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            border-radius: 30px;
+            transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+            color: #6B2E06;
+            text-decoration: none;
+        }
+
+        html.dark .nav-link-bread {
+            color: #FDE68A;
+        }
+
+        .nav-link-bread:hover {
+            background: rgba(217, 119, 6, 0.18);
+            transform: translateY(-2px);
+        }
+
+        html.dark .nav-link-bread:hover {
+            background: rgba(245, 158, 11, 0.18);
+            color: #FFFFFF;
+        }
+
+        .nav-link-bread.active {
+            color: #FFFFFF !important;
+            background: linear-gradient(135deg, #D92323 0%, #EA580C 50%, #F59E0B 100%) !important;
+            box-shadow: 0 4px 15px rgba(217, 35, 35, 0.4);
+        }
+
+        .nav-link-bread.active i {
+            color: #FFFFFF !important;
+        }
+
+        .hero-video-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #0D0907;
+            will-change: transform;
+        }
+
+        .hero-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: cover;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            filter: contrast(1.05) brightness(0.96);
+        }
+
+        .hero-lighting-overlay {
+            position: absolute;
+            inset: 0;
+            background: 
+                linear-gradient(180deg, rgba(13, 9, 7, 0.7) 0%, transparent 25%, transparent 65%, rgba(13, 9, 7, 0.85) 100%),
+                radial-gradient(circle at 50% 50%, transparent 35%, rgba(13, 9, 7, 0.5) 80%, rgba(13, 9, 7, 0.9) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .glass-clean {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(245, 158, 11, 0.22);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .dark .glass-clean {
+            background: rgba(32, 22, 15, 0.88);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(245, 158, 11, 0.16);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .text-bake-gradient {
+            background: linear-gradient(135deg, #D92323 0%, #EA580C 50%, #F59E0B 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        html.dark .text-bake-gradient {
+            background: linear-gradient(135deg, #FF5757 0%, #FBBF24 50%, #FFFBEB 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-backdrop {
+            background: rgba(13, 9, 7, 0.75);
+            backdrop-filter: blur(8px);
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #D92323; border-radius: 4px; }
+    </style>
+</head>
+<body class="page-bakery-bg text-stone-800 dark:text-stone-200 font-sans antialiased transition-colors duration-300 relative overflow-x-hidden">
+
+    <!-- BARRA DE NAVEGACIÓN FLOTANTE -->
+    <div class="bread-navbar-wrapper">
+        <header class="bread-navbar">
+            
+            <a href="#inicio" class="flex items-center gap-2.5 group pl-1">
+                <div class="relative flex items-center justify-center">
+                    <img src="1.png" alt="Logo La Portada" class="h-11 w-11 sm:h-13 sm:w-13 object-contain transition-transform duration-300 group-hover:scale-110 filter drop-shadow-md">
+                    <span class="absolute -top-1 -right-1 text-amber-500 text-xs">
+                        <i class="fa-solid fa-wheat-awn"></i>
+                    </span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-serif text-lg sm:text-xl font-black tracking-tight leading-none text-stone-900 dark:text-amber-300 group-hover:text-brand-red transition-colors">
+                        La Portada
+                    </span>
+                    <span class="font-script text-amber-800 dark:text-amber-400 text-xs font-bold -mt-0.5">
+                        Horno & Tradición
+                    </span>
+                </div>
+            </a>
+
+            <!-- LINKS DE NAVEGACIÓN -->
+            <nav class="hidden lg:flex items-center space-x-1" id="main-nav-menu">
+                <a href="#inicio" class="nav-link-bread active">
+                    <i class="fa-solid fa-bread-slice text-amber-600 dark:text-amber-400 text-xs"></i>
+                    <span>INICIO</span>
+                </a>
+                <a href="#servicios" class="nav-link-bread">
+                    <i class="fa-solid fa-fire-burner text-amber-600 dark:text-amber-400 text-xs"></i>
+                    <span>SERVICIOS</span>
+                </a>
+                <a href="#nosotros" class="nav-link-bread">
+                    <i class="fa-solid fa-heart text-amber-600 dark:text-amber-400 text-xs"></i>
+                    <span>NOSOTROS</span>
+                </a>
+                <a href="#carta" class="nav-link-bread">
+                    <i class="fa-solid fa-utensils text-amber-600 dark:text-amber-400 text-xs"></i>
+                    <span>MENÚ</span>
+                </a>
+                <a href="#eventos" class="nav-link-bread">
+                    <i class="fa-solid fa-cake-candles text-amber-600 dark:text-amber-400 text-xs"></i>
+                    <span>EVENTOS</span>
+                </a>
+                <a href="#contacto" class="nav-link-bread">
+                    <i class="fa-solid fa-location-dot text-amber-600 dark:text-amber-400 text-xs"></i>
+                    <span>UBICACIÓN</span>
+                </a>
+            </nav>
+
+            <!-- DERECHA: MODO OSCURO/CLARO & MÓVIL -->
+            <div class="flex items-center gap-2 pr-1">
+                <button class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-amber-100/90 dark:bg-stone-800/90 border border-amber-400 dark:border-amber-700/60 text-amber-900 dark:text-amber-300 flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-sm" id="theme-toggle" aria-label="Cambiar tema de color" title="Modo Oscuro / Claro">
+                    <i id="theme-icon" class="fa-solid fa-sun text-sm"></i>
+                </button>
+
+                <button id="mobile-menu-btn" class="lg:hidden text-stone-900 dark:text-amber-400 p-2 text-2xl" aria-label="Abrir menú">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+        </header>
+    </div>
+
+    <!-- MENÚ MÓVIL DESPLEGABLE -->
+    <div id="mobile-menu" class="hidden fixed top-24 left-4 right-4 z-50 bg-amber-50/98 dark:bg-stone-900/98 border-2 border-amber-500/50 rounded-3xl p-5 shadow-2xl space-y-2 backdrop-blur-xl">
+        <a href="#inicio" class="mobile-link block px-4 py-3 rounded-2xl font-bold text-brand-red bg-amber-200/50 dark:bg-stone-800/60 text-sm"><i class="fa-solid fa-bread-slice mr-2"></i> Inicio</a>
+        <a href="#servicios" class="mobile-link block px-4 py-3 rounded-2xl font-semibold text-stone-700 dark:text-stone-300 text-sm"><i class="fa-solid fa-fire-burner mr-2 text-amber-600"></i> Servicios</a>
+        <a href="#nosotros" class="mobile-link block px-4 py-3 rounded-2xl font-semibold text-stone-700 dark:text-stone-300 text-sm"><i class="fa-solid fa-heart mr-2 text-amber-600"></i> Nosotros</a>
+        <a href="#carta" class="mobile-link block px-4 py-3 rounded-2xl font-semibold text-stone-700 dark:text-stone-300 text-sm"><i class="fa-solid fa-utensils mr-2 text-amber-600"></i> Menú</a>
+        <a href="#eventos" class="mobile-link block px-4 py-3 rounded-2xl font-semibold text-stone-700 dark:text-stone-300 text-sm"><i class="fa-solid fa-cake-candles mr-2 text-amber-600"></i> Eventos & Catering</a>
+        <a href="#contacto" class="mobile-link block px-4 py-3 rounded-2xl font-semibold text-stone-700 dark:text-stone-300 text-sm"><i class="fa-solid fa-location-dot mr-2 text-amber-600"></i> Ubicación</a>
+    </div>
+
+    <!-- HERO SECTION -->
+    <section id="inicio" class="hero-video-container flex flex-col justify-between items-center px-4 sm:px-6 lg:px-8">
+        
+        <video autoplay muted loop playsinline class="hero-video">
+            <source src="inicio.mp4" type="video/mp4">
+            Tu navegador no soporta videos HTML5.
+        </video>
+
+        <div class="hero-lighting-overlay"></div>
+
+        <div class="relative z-10 text-center pt-28 sm:pt-32">
+            <div class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-black/50 border border-amber-400/40 text-amber-200 text-xs sm:text-sm font-bold uppercase tracking-widest backdrop-blur-md shadow-2xl">
+                <i class="fa-solid fa-wheat-awn text-amber-400"></i> San José del Guaviare • Tradición & Buen Sabor
+            </div>
+        </div>
+
+        <div class="relative z-10 w-full flex-grow pointer-events-none"></div>
+
+        <div class="relative z-10 w-full max-w-3xl text-center pb-14 sm:pb-16">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+                
+                <a href="#carta" class="w-full sm:w-auto bg-gradient-to-r from-brand-red via-orange-500 to-amber-500 hover:from-brand-darkRed hover:to-amber-600 text-white font-extrabold text-sm uppercase tracking-wider px-8 py-4 rounded-full shadow-2xl shadow-brand-red/60 transition-all transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2.5 border border-amber-300/40">
+                    <i class="fa-solid fa-utensils text-yellow-200"></i> Ver Menú
+                </a>
+                
+                <a href="#eventos" class="w-full sm:w-auto bg-black/60 hover:bg-black/85 text-white border-2 border-amber-400/80 hover:border-amber-300 font-bold text-sm uppercase tracking-wider px-8 py-4 rounded-full backdrop-blur-md transition-all transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2.5 shadow-xl">
+                    <i class="fa-solid fa-cake-candles text-amber-400"></i> Eventos y Pedidos
+                </a>
+                
+                <a href="#contacto" class="w-full sm:w-auto bg-black/60 hover:bg-black/85 text-white border-2 border-amber-400/80 hover:border-amber-300 font-bold text-sm uppercase tracking-wider px-8 py-4 rounded-full backdrop-blur-md transition-all transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2.5 shadow-xl">
+                    <i class="fa-solid fa-location-dot text-amber-400"></i> Ubicación
+                </a>
+
+            </div>
+        </div>
+
+    </section>
+
+    <!-- SECCIÓN SERVICIOS -->
+    <section id="servicios" class="relative z-10 py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <span class="font-script text-3xl sm:text-4xl text-brand-red dark:text-amber-400 block mb-1">Nuestras 4 Estaciones</span>
+                <h2 class="font-serif text-3xl sm:text-5xl font-black text-stone-900 dark:text-white">Tradición & Especialidades</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                
+                <div class="glass-clean rounded-3xl p-8 text-center hover:-translate-y-2 transition-all shadow-md group">
+                    <div class="w-20 h-20 bg-gradient-to-tr from-amber-400 to-yellow-200 text-stone-950 rounded-full flex items-center justify-center text-3xl mx-auto mb-6 shadow-md group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-bread-slice"></i>
+                    </div>
+                    <h3 class="font-serif font-black text-2xl text-stone-900 dark:text-white mb-1">Panadería</h3>
+                    <span class="text-xs font-bold text-brand-red dark:text-amber-400 uppercase tracking-wider block mb-3">Horneado Diario</span>
+                    <p class="text-stone-600 dark:text-stone-300 text-sm leading-relaxed">Pan caliente, hojaldres crujientes y pandebonos campesinos a toda hora.</p>
+                </div>
+
+                <div class="glass-clean rounded-3xl p-8 text-center hover:-translate-y-2 transition-all shadow-md group">
+                    <div class="w-20 h-20 bg-gradient-to-tr from-pink-500 to-rose-300 text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-6 shadow-md group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-ice-cream"></i>
+                    </div>
+                    <h3 class="font-serif font-black text-2xl text-stone-900 dark:text-white mb-1">Heladería</h3>
+                    <span class="text-xs font-bold text-brand-red dark:text-amber-400 uppercase tracking-wider block mb-3">Sabores que Enamoran</span>
+                    <p class="text-stone-600 dark:text-stone-300 text-sm leading-relaxed">Copas especiales, malteadas y postres para refrescar el día.</p>
+                </div>
+
+                <div class="glass-clean rounded-3xl p-8 text-center hover:-translate-y-2 transition-all shadow-md group">
+                    <div class="w-20 h-20 bg-gradient-to-tr from-brand-red to-orange-500 text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-6 shadow-md group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-fire-flame-curved"></i>
+                    </div>
+                    <h3 class="font-serif font-black text-2xl text-stone-900 dark:text-white mb-1">Asadero</h3>
+                    <span class="text-xs font-bold text-brand-red dark:text-amber-400 uppercase tracking-wider block mb-3">El Mejor Pollo</span>
+                    <p class="text-stone-600 dark:text-stone-300 text-sm leading-relaxed">Pollo asado al carbón jugoso y dorado con sazón tradicional.</p>
+                </div>
+
+                <div class="glass-clean rounded-3xl p-8 text-center hover:-translate-y-2 transition-all shadow-md group">
+                    <div class="w-20 h-20 bg-gradient-to-tr from-amber-600 to-yellow-500 text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-6 shadow-md group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-utensils"></i>
+                    </div>
+                    <h3 class="font-serif font-black text-2xl text-stone-900 dark:text-white mb-1">Restaurante</h3>
+                    <span class="text-xs font-bold text-brand-red dark:text-amber-400 uppercase tracking-wider block mb-3">Sabor Familiar</span>
+                    <p class="text-stone-600 dark:text-stone-300 text-sm leading-relaxed">Almuerzos caseros completos y desayunos en un ambiente amplio.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN NOSOTROS -->
+    <section id="nosotros" class="relative z-10 py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <div class="lg:col-span-6 relative">
+                    <div class="rounded-3xl overflow-hidden shadow-xl border-4 border-white dark:border-amber-500/20 group">
+                        <img src="https://i.postimg.cc/mrX0XP0d/569b8f09-0249-492c-9f38-3663c0a5efde.png" alt="La Portada Instalaciones" class="w-full h-[430px] object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6">
+                    <span class="font-script text-3xl sm:text-4xl text-brand-red dark:text-amber-400 block mb-2">Nuestra Pasión</span>
+                    <h2 class="font-serif text-3xl sm:text-5xl font-black text-stone-900 dark:text-white leading-tight mb-6">
+                        Bienvenidos a La Portada
+                    </h2>
+                    <p class="text-stone-600 dark:text-stone-300 text-base md:text-lg mb-6 leading-relaxed">
+                        Ubicados en San José del Guaviare, somos el punto de encuentro predilecto para viajeros y familias. Aquí se fusionan el aroma del café matutino, la calidez de un pan recién horneado y el sabor irresistible de platos preparados con sazón único.
+                    </p>
+                    <p class="text-stone-600 dark:text-stone-300 text-base mb-8 leading-relaxed">
+                        Nos esforzamos cada día por brindar una atención amable y productos con los mejores ingredientes de la región.
+                    </p>
+
+                    <div class="grid grid-cols-3 gap-4 pt-4 border-t border-amber-200/50 dark:border-amber-900/40 text-center">
+                        <div>
+                            <span class="font-serif font-black text-3xl text-bake-gradient block">100%</span>
+                            <span class="text-xs font-bold text-stone-500 uppercase">Artesanal</span>
+                        </div>
+                        <div>
+                            <span class="font-serif font-black text-3xl text-bake-gradient block">+10k</span>
+                            <span class="text-xs font-bold text-stone-500 uppercase">Sonrisas</span>
+                        </div>
+                        <div>
+                            <span class="font-serif font-black text-3xl text-bake-gradient block">4.9 ★</span>
+                            <span class="text-xs font-bold text-stone-500 uppercase">Calificación</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN MENÚ -->
+    <section id="carta" class="relative z-10 py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <span class="font-script text-3xl sm:text-4xl text-brand-red dark:text-amber-400 block mb-1">Variedad & Sabor</span>
+                <h2 class="font-serif text-3xl sm:text-5xl font-black text-stone-900 dark:text-white mb-4">Menú</h2>
+                <p class="text-stone-600 dark:text-stone-400 text-base">Selecciona tu categoría favorita y descubre nuestros productos.</p>
+            </div>
+
+            <!-- Filtros -->
+            <div class="flex flex-wrap justify-center gap-3 mb-14">
+                <button onclick="filterMenu('all', this)" class="tab-btn active bg-brand-red text-white font-bold px-7 py-3 rounded-full text-xs uppercase tracking-wider shadow-md transition-all transform hover:scale-105">
+                    Todo
+                </button>
+                <button onclick="filterMenu('panaderia', this)" class="tab-btn glass-clean text-stone-700 dark:text-stone-200 font-bold px-7 py-3 rounded-full text-xs uppercase tracking-wider hover:border-brand-red transition-all transform hover:scale-105 shadow-sm">
+                    🥖 Panadería
+                </button>
+                <button onclick="filterMenu('asadero', this)" class="tab-btn glass-clean text-stone-700 dark:text-stone-200 font-bold px-7 py-3 rounded-full text-xs uppercase tracking-wider hover:border-brand-red transition-all transform hover:scale-105 shadow-sm">
+                    🍗 Asadero & Restaurante
+                </button>
+                <button onclick="filterMenu('heladeria', this)" class="tab-btn glass-clean text-stone-700 dark:text-stone-200 font-bold px-7 py-3 rounded-full text-xs uppercase tracking-wider hover:border-brand-red transition-all transform hover:scale-105 shadow-sm">
+                    🍨 Heladería
+                </button>
+                <button onclick="filterMenu('bebidas', this)" class="tab-btn glass-clean text-stone-700 dark:text-stone-200 font-bold px-7 py-3 rounded-full text-xs uppercase tracking-wider hover:border-brand-red transition-all transform hover:scale-105 shadow-sm">
+                    ☕ Cafetería
+                </button>
+            </div>
+
+            <!-- Grid de Platos -->
+            <div id="menu-items-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <div class="menu-item panaderia glass-clean rounded-3xl overflow-hidden hover:-translate-y-2 transition-all shadow-md">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1549931319-a545dcf3bc73?q=80&w=600&auto=format&fit=crop" alt="Pan Caliente de la Casa" class="w-full h-full object-cover">
+                        <span class="absolute top-4 right-4 bg-amber-500 text-stone-950 font-black text-xs px-3 py-1 rounded-full uppercase shadow">Horneado Diario</span>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-serif font-black text-xl text-stone-900 dark:text-white">Pan Caliente de la Casa</h4>
+                            <span class="font-serif font-black text-brand-red dark:text-amber-400 text-xl">$4.500</span>
+                        </div>
+                        <p class="text-stone-600 dark:text-stone-400 text-xs mb-3">Masa suave tradicional con corteza dorada y miga ligera.</p>
+                        <span class="text-[10px] bg-amber-500/20 text-amber-800 dark:text-amber-300 font-bold px-2.5 py-1 rounded-full uppercase">Panadería</span>
+                    </div>
+                </div>
+
+                <div class="menu-item panaderia glass-clean rounded-3xl overflow-hidden hover:-translate-y-2 transition-all shadow-md">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1586444248902-2f64eddc13df?q=80&w=600&auto=format&fit=crop" alt="Pandebono y Almojábana" class="w-full h-full object-cover">
+                        <span class="absolute top-4 right-4 bg-amber-500 text-stone-950 font-black text-xs px-3 py-1 rounded-full uppercase shadow">Receta Secreta</span>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-serif font-black text-xl text-stone-900 dark:text-white">Pandebono & Almojábana</h4>
+                            <span class="font-serif font-black text-brand-red dark:text-amber-400 text-xl">$4.000</span>
+                        </div>
+                        <p class="text-stone-600 dark:text-stone-400 text-xs mb-3">Elaborados con auténtico queso fresco campesino y almidón natural.</p>
+                        <span class="text-[10px] bg-amber-500/20 text-amber-800 dark:text-amber-300 font-bold px-2.5 py-1 rounded-full uppercase">Amasijos</span>
+                    </div>
+                </div>
+
+                <div class="menu-item asadero glass-clean rounded-3xl overflow-hidden hover:-translate-y-2 transition-all shadow-md">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1598103442097-8b74394b95c6?q=80&w=600&auto=format&fit=crop" alt="Pollo Asado La Portada" class="w-full h-full object-cover">
+                        <span class="absolute top-4 right-4 bg-brand-red text-white font-black text-xs px-3 py-1 rounded-full uppercase shadow">Especialidad</span>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-serif font-black text-xl text-stone-900 dark:text-white">Pollo Asado La Portada</h4>
+                            <span class="font-serif font-black text-brand-red dark:text-amber-400 text-xl">$36.000</span>
+                        </div>
+                        <p class="text-stone-600 dark:text-stone-400 text-xs mb-3">Jugoso por dentro, piel dorada con papas cocidas y arepas.</p>
+                        <span class="text-[10px] bg-red-500/20 text-brand-red dark:text-red-400 font-bold px-2.5 py-1 rounded-full uppercase">Asadero</span>
+                    </div>
+                </div>
+
+                <div class="menu-item asadero glass-clean rounded-3xl overflow-hidden hover:-translate-y-2 transition-all shadow-md">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=600&auto=format&fit=crop" alt="Almuerzo Ejecutivo y Familiar" class="w-full h-full object-cover">
+                        <span class="absolute top-4 right-4 bg-brand-red text-white font-black text-xs px-3 py-1 rounded-full uppercase shadow">Completo</span>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-serif font-black text-xl text-stone-900 dark:text-white">Almuerzo Ejecutivo</h4>
+                            <span class="font-serif font-black text-brand-red dark:text-amber-400 text-xl">$16.000</span>
+                        </div>
+                        <p class="text-stone-600 dark:text-stone-400 text-xs mb-3">Sopa campesina del día, proteína al gusto, arroz, ensalada y jugo.</p>
+                        <span class="text-[10px] bg-red-500/20 text-brand-red dark:text-red-400 font-bold px-2.5 py-1 rounded-full uppercase">Restaurante</span>
+                    </div>
+                </div>
+
+                <div class="menu-item heladeria glass-clean rounded-3xl overflow-hidden hover:-translate-y-2 transition-all shadow-md">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?q=80&w=600&auto=format&fit=crop" alt="Copa Especial de Helado" class="w-full h-full object-cover">
+                        <span class="absolute top-4 right-4 bg-pink-500 text-white font-black text-xs px-3 py-1 rounded-full uppercase shadow">Favorito</span>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-serif font-black text-xl text-stone-900 dark:text-white">Copa Especial La Portada</h4>
+                            <span class="font-serif font-black text-brand-red dark:text-amber-400 text-xl">$12.000</span>
+                        </div>
+                        <p class="text-stone-600 dark:text-stone-400 text-xs mb-3">Bolas de helado artesanal con barquillos, crema chantilly y salsa.</p>
+                        <span class="text-[10px] bg-pink-500/20 text-pink-700 dark:text-pink-300 font-bold px-2.5 py-1 rounded-full uppercase">Heladería</span>
+                    </div>
+                </div>
+
+                <div class="menu-item bebidas glass-clean rounded-3xl overflow-hidden hover:-translate-y-2 transition-all shadow-md">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=600&auto=format&fit=crop" alt="Café Origen Colombiano" class="w-full h-full object-cover">
+                        <span class="absolute top-4 right-4 bg-amber-600 text-white font-black text-xs px-3 py-1 rounded-full uppercase shadow">100% Origen</span>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-serif font-black text-xl text-stone-900 dark:text-white">Café Especial</h4>
+                            <span class="font-serif font-black text-brand-red dark:text-amber-400 text-xl">$6.000</span>
+                        </div>
+                        <p class="text-stone-600 dark:text-stone-400 text-xs mb-3">Cappuccino espumoso, latte suave o tinto campesino aromático.</p>
+                        <span class="text-[10px] bg-amber-500/20 text-amber-800 dark:text-amber-300 font-bold px-2.5 py-1 rounded-full uppercase">Bebidas</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         SECCIÓN EVENTOS (ADAPTADA DINÁMICAMENTE A MODO CLARO Y OSCURO)
+         ========================================================= -->
+    <section id="eventos" class="relative z-10 py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-amber-100/90 via-orange-50 to-amber-50 dark:from-amber-950 dark:via-stone-900 dark:to-[#0c0806] text-stone-800 dark:text-white p-8 sm:p-14 lg:p-20 shadow-2xl border-2 border-amber-500/40 dark:border-amber-500/30 transition-colors duration-300">
+                
+                <div class="relative z-10 max-w-3xl">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/15 dark:bg-amber-500/20 border border-amber-600/30 dark:border-amber-400/40 text-amber-900 dark:text-amber-300 text-xs font-bold uppercase tracking-widest mb-6">
+                        <i class="fa-solid fa-cake-candles text-amber-600 dark:text-amber-400"></i> Servicio de Catering & Banquetes
+                    </div>
+                    
+                    <h2 class="font-serif text-3xl sm:text-5xl lg:text-6xl font-black leading-tight mb-6 text-stone-900 dark:text-white">
+                        ¿Planeas un evento o necesitas comida para tu grupo?
+                    </h2>
+                    
+                    <p class="text-stone-700 dark:text-stone-300 text-base sm:text-lg mb-10 leading-relaxed font-normal">
+                        Desayunos corporativos, almuerzos ejecutivos, banquetes con pollo asado al carbón y mesas completas de panadería artesanal. Diseñamos menús a tu medida en San José del Guaviare.
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10 text-sm font-semibold text-stone-800 dark:text-amber-200">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-circle-check text-brand-red text-lg"></i>
+                            <span>Atención a empresas, familias y tours</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-circle-check text-brand-red text-lg"></i>
+                            <span>Puntualidad en entregas y servicios</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-circle-check text-brand-red text-lg"></i>
+                            <span>Porciones abundantes y sazón fresco</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-circle-check text-brand-red text-lg"></i>
+                            <span>Propuestas según tu presupuesto</span>
+                        </div>
+                    </div>
+
+                    <a href="https://wa.me/573213294659?text=Hola,%20quisiera%20cotizar%20un%20servicio%20de%20comida%20para%20un%20evento%20en%20San%20Jos%C3%A9%20del%20Guaviare" target="_blank" class="inline-flex items-center gap-3 bg-gradient-to-r from-brand-red via-orange-500 to-amber-500 hover:from-brand-darkRed hover:to-amber-600 text-white font-black text-xs sm:text-sm uppercase tracking-wider px-9 py-4 rounded-full shadow-2xl shadow-brand-red/40 transition-all transform hover:scale-105">
+                        <i class="fa-brands fa-whatsapp text-xl"></i> Cotizar Mi Evento (321 329 4659)
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SECCIÓN UBICACIÓN & CONTACTO -->
+    <section id="contacto" class="relative z-10 py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-16">
+                
+                <div class="lg:col-span-6">
+                    <span class="font-script text-3xl sm:text-4xl text-brand-red dark:text-amber-400 block mb-1">Visítanos & Contáctanos</span>
+                    <h2 class="font-serif text-3xl sm:text-5xl font-black text-stone-900 dark:text-white mb-6">
+                        Ubicación La Portada
+                    </h2>
+                    <p class="text-stone-600 dark:text-stone-300 text-base md:text-lg mb-8 leading-relaxed">
+                        Estamos ubicados en San José del Guaviare para atenderte con lo mejor de la panadería, heladería, asadero y restaurante. Haz tus pedidos directos o llámanos.
+                    </p>
+
+                    <div class="space-y-4 mb-8">
+                        <a href="tel:+573213294659" class="flex items-center gap-4 p-4 rounded-2xl glass-clean hover:scale-[1.02] transition-all group block">
+                            <div class="w-12 h-12 rounded-xl bg-brand-red/15 text-brand-red group-hover:bg-brand-red group-hover:text-white transition-colors flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <h4 class="font-bold text-stone-900 dark:text-white text-sm">Línea de Atención & Pedidos</h4>
+                                <p class="text-brand-red dark:text-amber-400 font-extrabold text-sm tracking-wide">+57 321 329 4659</p>
+                            </div>
+                            <span class="text-xs bg-amber-500/20 text-amber-800 dark:text-amber-300 px-3 py-1 rounded-full font-bold">Llamar</span>
+                        </a>
+
+                        <div class="flex items-center gap-4 p-4 rounded-2xl glass-clean">
+                            <div class="w-12 h-12 rounded-xl bg-brand-red/15 text-brand-red flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-stone-900 dark:text-white text-sm">Punto de Atención</h4>
+                                <p class="text-stone-500 dark:text-stone-400 text-xs">San José del Guaviare, Guaviare, Colombia</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 p-4 rounded-2xl glass-clean">
+                            <div class="w-12 h-12 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-stone-900 dark:text-white text-sm">Horario de Atención</h4>
+                                <p class="text-stone-500 dark:text-stone-400 text-xs">Lunes a Domingo • Jornada Continua</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="https://share.google/aFsJLswzARNx5DqyV" target="_blank" class="inline-flex items-center gap-3 bg-gradient-to-r from-brand-red to-amber-500 hover:from-brand-darkRed hover:to-amber-600 text-white font-black text-xs uppercase tracking-wider px-8 py-4 rounded-full shadow-lg shadow-brand-red/25 transition-all transform hover:scale-105">
+                        <i class="fa-brands fa-google text-base"></i> Abrir en Google Maps Oficial
+                    </a>
+                </div>
+
+                <div class="lg:col-span-6">
+                    <div class="rounded-3xl overflow-hidden shadow-xl border-2 border-white dark:border-amber-500/20 h-[420px] relative">
+                        <div id="map" class="w-full h-full z-10"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- REDES SOCIALES -->
+            <div class="pt-10 border-t border-amber-200/50 dark:border-amber-900/40 text-center">
+                <span class="font-script text-2xl sm:text-3xl text-brand-red dark:text-amber-400 block mb-2">Conéctate Con Nosotros</span>
+                <h3 class="font-serif font-black text-2xl text-stone-900 dark:text-white mb-6">Síguenos en Redes Sociales</h3>
+                
+                <div class="flex flex-wrap justify-center gap-5">
+                    <a href="https://instagram.com" target="_blank" class="glass-clean px-7 py-3 rounded-full flex items-center gap-3 hover:-translate-y-1 transition-all shadow-sm group">
+                        <i class="fa-brands fa-instagram text-pink-600 text-xl"></i>
+                        <span class="font-bold text-sm text-stone-800 dark:text-stone-200 group-hover:text-pink-600">Instagram</span>
+                    </a>
+
+                    <a href="https://facebook.com" target="_blank" class="glass-clean px-7 py-3 rounded-full flex items-center gap-3 hover:-translate-y-1 transition-all shadow-sm group">
+                        <i class="fa-brands fa-facebook-f text-blue-600 text-xl"></i>
+                        <span class="font-bold text-sm text-stone-800 dark:text-stone-200 group-hover:text-blue-600">Facebook</span>
+                    </a>
+
+                    <a href="https://tiktok.com" target="_blank" class="glass-clean px-7 py-3 rounded-full flex items-center gap-3 hover:-translate-y-1 transition-all shadow-sm group">
+                        <i class="fa-brands fa-tiktok text-stone-900 dark:text-white text-xl"></i>
+                        <span class="font-bold text-sm text-stone-800 dark:text-stone-200">TikTok</span>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="relative z-10 bg-white/70 dark:bg-stone-900/70 border-t border-amber-200/40 dark:border-amber-900/40 py-8 text-center text-xs text-stone-500 dark:text-stone-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
+            <p>© 2026 La Portada - San José del Guaviare. Tierra de historias, gente amable.</p>
+            
+            <div class="flex items-center justify-center gap-6 font-medium text-stone-600 dark:text-stone-400">
+                <button onclick="openModal('terminosModal')" class="hover:text-brand-red dark:hover:text-amber-400 underline transition-colors">
+                    Términos y Condiciones
+                </button>
+                <span>•</span>
+                <button onclick="openModal('privacidadModal')" class="hover:text-brand-red dark:hover:text-amber-400 underline transition-colors">
+                    Políticas de Privacidad
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL TÉRMINOS Y CONDICIONES -->
+    <div id="terminosModal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-stone-900 rounded-3xl max-w-lg w-full p-6 sm:p-8 border-2 border-amber-500/40 shadow-2xl max-h-[85vh] overflow-y-auto text-left">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-serif font-black text-xl text-stone-900 dark:text-white">Términos y Condiciones</h3>
+                <button onclick="closeModal('terminosModal')" class="text-stone-400 hover:text-stone-600 dark:hover:text-white text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="text-xs text-stone-600 dark:text-stone-300 space-y-3 leading-relaxed">
+                <p>Bienvenido a La Portada. Al utilizar este sitio web y solicitar nuestros servicios de panadería, asadero, heladería y catering, aceptas cumplir con los presentes términos.</p>
+                <p><strong>1. Pedidos y Eventos:</strong> Las cotizaciones para eventos y pedidos especiales están sujetas a disponibilidad y confirmación previa.</p>
+                <p><strong>2. Precios y Productos:</strong> Los precios publicados son orientativos y pueden variar según especificaciones o cambios en los insumos.</p>
+                <p><strong>3. Responsabilidad:</strong> Nos comprometemos a entregar productos frescos elaborados bajo estándares de calidad e higiene.</p>
+            </div>
+            <div class="mt-6 text-right">
+                <button onclick="closeModal('terminosModal')" class="bg-brand-red text-white font-bold text-xs px-5 py-2.5 rounded-full hover:bg-brand-darkRed transition-all">
+                    Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POLÍTICAS DE PRIVACIDAD -->
+    <div id="privacidadModal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-stone-900 rounded-3xl max-w-lg w-full p-6 sm:p-8 border-2 border-amber-500/40 shadow-2xl max-h-[85vh] overflow-y-auto text-left">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-serif font-black text-xl text-stone-900 dark:text-white">Políticas de Privacidad</h3>
+                <button onclick="closeModal('privacidadModal')" class="text-stone-400 hover:text-stone-600 dark:hover:text-white text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="text-xs text-stone-600 dark:text-stone-300 space-y-3 leading-relaxed">
+                <p>En La Portada valoramos y protegemos la privacidad de nuestros clientes y visitantes.</p>
+                <p><strong>1. Uso de Información:</strong> Los datos suministrados a través de WhatsApp o canales de contacto se utilizarán exclusivamente para la gestión de pedidos, cotizaciones y atención al cliente.</p>
+                <p><strong>2. Seguridad:</strong> No compartimos ni vendemos información personal a terceros bajo ninguna circunstancia.</p>
+                <p><strong>3. Derechos:</strong> Puedes solicitar la actualización o eliminación de tus datos de contacto en cualquier momento.</p>
+            </div>
+            <div class="mt-6 text-right">
+                <button onclick="closeModal('privacidadModal')" class="bg-brand-red text-white font-bold text-xs px-5 py-2.5 rounded-full hover:bg-brand-darkRed transition-all">
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÓN FLOTANTE DE WHATSAPP -->
+    <a href="https://wa.me/573213294659?text=Hola,%20quisiera%20hacer%20un%20pedido%20o%20consulta%20en%20La%20Portada" target="_blank" class="fixed bottom-6 right-6 z-50 bg-[#25D366] hover:bg-[#1EBE5D] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl shadow-green-500/40 transform hover:scale-110 active:scale-95 transition-all duration-300" aria-label="WhatsApp">
+        <i class="fa-brands fa-whatsapp text-3xl"></i>
+    </a>
+
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // Menú Móvil
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        if (mobileBtn && mobileMenu) {
+            mobileBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+        }
+
+        // Modo Oscuro / Claro
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const html = document.getElementById('html-root');
+
+        function updateThemeIcon(isDark) {
+            if (isDark) {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            } else {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+        }
+
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            updateThemeIcon(true);
+        } else {
+            html.classList.remove('dark');
+            updateThemeIcon(false);
+        }
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            const isDark = html.classList.contains('dark');
+            localStorage.setItem('color-theme', isDark ? 'dark' : 'light');
+            updateThemeIcon(isDark);
+            if (window.switchMapTile) {
+                window.switchMapTile(isDark);
+            }
+        });
+
+        // ScrollSpy Fluido
+        const sections = document.querySelectorAll("section[id]");
+        const navLinks = document.querySelectorAll("#main-nav-menu .nav-link-bread");
+
+        window.addEventListener("scroll", () => {
+            let current = "";
+            const scrollY = window.pageYOffset;
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 140;
+                const sectionHeight = section.offsetHeight;
+                if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+                    current = section.getAttribute("id");
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove("active");
+                if (link.getAttribute("href") === `#${current}`) {
+                    link.classList.add("active");
+                }
+            });
+        }, { passive: true });
+
+        // Filtro del Menú
+        function filterMenu(category, element) {
+            const items = document.querySelectorAll('.menu-item');
+            const buttons = document.querySelectorAll('.tab-btn');
+
+            buttons.forEach(b => {
+                b.classList.remove('bg-brand-red', 'text-white', 'shadow-md');
+                b.classList.add('glass-clean', 'text-stone-700', 'dark:text-stone-200');
+            });
+
+            element.classList.remove('glass-clean', 'text-stone-700', 'dark:text-stone-200');
+            element.classList.add('bg-brand-red', 'text-white', 'shadow-md');
+
+            items.forEach(i => {
+                if (category === 'all' || i.classList.contains(category)) {
+                    i.style.display = 'block';
+                } else {
+                    i.style.display = 'none';
+                }
+            });
+        }
+
+        // Modales
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        // Mapa Leaflet con CartoDB Tiles
+        document.addEventListener('DOMContentLoaded', () => {
+            const lat = 2.5711632;
+            const lng = -72.6443025;
+            const map = L.map('map', {
+                scrollWheelZoom: false
+            }).setView([lat, lng], 17);
+
+            const lightTiles = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+            const darkTiles = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+
+            const isDark = document.getElementById('html-root').classList.contains('dark');
+            let currentTileLayer = L.tileLayer(isDark ? darkTiles : lightTiles, {
+                attribution: '&copy; <a href="https://carto.com/">CARTO</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+
+            window.switchMapTile = function(darkMode) {
+                map.removeLayer(currentTileLayer);
+                currentTileLayer = L.tileLayer(darkMode ? darkTiles : lightTiles, {
+                    attribution: '&copy; CARTO &copy; OpenStreetMap',
+                    subdomains: 'abcd',
+                    maxZoom: 20
+                }).addTo(map);
+            };
+
+            const customIcon = L.divIcon({
+                className: 'custom-icon',
+                html: `<div style="background:#D92323; width:44px; height:44px; border-radius:50%; border:3px solid white; display:flex; align-items:center; justify-content:center; color:white; font-size:18px; box-shadow:0 8px 20px rgba(217,35,35,0.45); cursor:pointer;"><i class="fa-solid fa-utensils"></i></div>`,
+                iconSize: [44, 44],
+                iconAnchor: [22, 22]
+            });
+
+            L.marker([lat, lng], { icon: customIcon }).addTo(map)
+                .bindPopup(`
+                    <div style="font-family:'Plus Jakarta Sans',sans-serif; text-align:center; padding:4px;">
+                        <strong style="font-size:14px; color:#D92323; display:block; margin-bottom:2px;">Restaurante y Asadero La Portada</strong>
+                        <span style="font-size:12px; color:#555;">San José del Guaviare</span><br>
+                        <a href="tel:+573213294659" style="display:inline-block; margin-top:6px; font-weight:800; font-size:12px; color:#D92323;">
+                            <i class="fa-solid fa-phone"></i> 321 329 4659
+                        </a><br>
+                        <a href="https://share.google/aFsJLswzARNx5DqyV" target="_blank" style="display:inline-block; margin-top:4px; font-weight:700; font-size:11px; color:#EA580C; text-decoration:underline;">
+                            Ver en Google Maps
+                        </a>
+                    </div>
+                `)
+                .openPopup();
+        });
+    </script>
+</body>
+</html>
