@@ -2,7 +2,7 @@
 <html lang="es" class="scroll-smooth" id="html-root">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>La Portada | Panadería, Heladería, Asadero & Eventos</title>
     
     <!-- Tailwind CSS CDN -->
@@ -143,35 +143,40 @@
             color: #FFFFFF !important;
         }
 
+        /* HERO ULTRA-RESPONSIVE */
         .hero-video-container {
             position: relative;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100svh; /* viewport seguro en móviles */
             overflow: hidden;
             background-color: #0D0907;
-            will-change: transform;
         }
 
         .hero-video {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
+            inset: 0;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            transform: translate(-50%, -50%);
+            object-position: center center;
             z-index: 1;
             filter: contrast(1.05) brightness(0.96);
+        }
+
+        @media (max-width: 640px) {
+            .hero-video {
+                object-fit: cover;
+                object-position: 50% 50%;
+            }
         }
 
         .hero-lighting-overlay {
             position: absolute;
             inset: 0;
             background: 
-                linear-gradient(180deg, rgba(13, 9, 7, 0.7) 0%, transparent 25%, transparent 65%, rgba(13, 9, 7, 0.85) 100%),
-                radial-gradient(circle at 50% 50%, transparent 35%, rgba(13, 9, 7, 0.5) 80%, rgba(13, 9, 7, 0.9) 100%);
+                linear-gradient(180deg, rgba(13, 9, 7, 0.75) 0%, rgba(13, 9, 7, 0.3) 25%, rgba(13, 9, 7, 0.3) 65%, rgba(13, 9, 7, 0.9) 100%),
+                radial-gradient(circle at 50% 50%, transparent 20%, rgba(13, 9, 7, 0.6) 85%, rgba(13, 9, 7, 0.95) 100%);
             z-index: 2;
             pointer-events: none;
         }
@@ -287,7 +292,9 @@
         <a href="#contacto" class="mobile-link block px-4 py-3 rounded-2xl font-semibold text-stone-700 dark:text-stone-300 text-sm"><i class="fa-solid fa-location-dot mr-2 text-amber-600"></i> Ubicación</a>
     </div>
 
-    <!-- HERO SECTION -->
+    <!-- =========================================================
+         HERO ULTRA-RESPONSIVE (ADAPTADO A MÓVILES Y PANTALLAS GRANDES)
+         ========================================================= -->
     <section id="inicio" class="hero-video-container flex flex-col justify-between items-center px-4 sm:px-6 lg:px-8">
         
         <video autoplay muted loop playsinline class="hero-video">
@@ -297,26 +304,29 @@
 
         <div class="hero-lighting-overlay"></div>
 
-        <div class="relative z-10 text-center pt-28 sm:pt-32">
-            <div class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-black/50 border border-amber-400/40 text-amber-200 text-xs sm:text-sm font-bold uppercase tracking-widest backdrop-blur-md shadow-2xl">
-                <i class="fa-solid fa-wheat-awn text-amber-400"></i> San José del Guaviare • Tradición & Buen Sabor
+        <!-- Parte Superior: Badge Flotante -->
+        <div class="relative z-10 text-center pt-24 sm:pt-32">
+            <div class="inline-flex items-center gap-2 px-5 py-2 sm:px-6 sm:py-2.5 rounded-full bg-black/60 border border-amber-400/50 text-amber-200 text-xs sm:text-sm font-bold uppercase tracking-wider sm:tracking-widest backdrop-blur-md shadow-2xl">
+                <i class="fa-solid fa-wheat-awn text-amber-400"></i> San José del Guaviare • Tradición & Sabor
             </div>
         </div>
 
-        <div class="relative z-10 w-full flex-grow pointer-events-none"></div>
+        <!-- CENTRO DESPEJADO PARA VISUALIZACIÓN COMPLETA DEL VIDEO / LOGO -->
+        <div class="relative z-10 w-full min-h-[140px] sm:min-h-[220px] flex-grow pointer-events-none"></div>
 
-        <div class="relative z-10 w-full max-w-3xl text-center pb-14 sm:pb-16">
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+        <!-- Parte Inferior: Botones Optimizados para Móvil y Desktop -->
+        <div class="relative z-10 w-full max-w-3xl text-center pb-8 sm:pb-14">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 px-2">
                 
-                <a href="#carta" class="w-full sm:w-auto bg-gradient-to-r from-brand-red via-orange-500 to-amber-500 hover:from-brand-darkRed hover:to-amber-600 text-white font-extrabold text-sm uppercase tracking-wider px-8 py-4 rounded-full shadow-2xl shadow-brand-red/60 transition-all transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2.5 border border-amber-300/40">
+                <a href="#carta" class="w-full sm:w-auto bg-gradient-to-r from-brand-red via-orange-500 to-amber-500 hover:from-brand-darkRed hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider px-7 py-3.5 sm:px-8 sm:py-4 rounded-full shadow-2xl shadow-brand-red/60 transition-all transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2 border border-amber-300/40">
                     <i class="fa-solid fa-utensils text-yellow-200"></i> Ver Menú
                 </a>
                 
-                <a href="#eventos" class="w-full sm:w-auto bg-black/60 hover:bg-black/85 text-white border-2 border-amber-400/80 hover:border-amber-300 font-bold text-sm uppercase tracking-wider px-8 py-4 rounded-full backdrop-blur-md transition-all transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2.5 shadow-xl">
+                <a href="#eventos" class="w-full sm:w-auto bg-black/65 hover:bg-black/90 text-white border-2 border-amber-400/80 hover:border-amber-300 font-bold text-xs sm:text-sm uppercase tracking-wider px-7 py-3.5 sm:px-8 sm:py-4 rounded-full backdrop-blur-md transition-all transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2 shadow-xl">
                     <i class="fa-solid fa-cake-candles text-amber-400"></i> Eventos y Pedidos
                 </a>
                 
-                <a href="#contacto" class="w-full sm:w-auto bg-black/60 hover:bg-black/85 text-white border-2 border-amber-400/80 hover:border-amber-300 font-bold text-sm uppercase tracking-wider px-8 py-4 rounded-full backdrop-blur-md transition-all transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2.5 shadow-xl">
+                <a href="#contacto" class="w-full sm:w-auto bg-black/65 hover:bg-black/90 text-white border-2 border-amber-400/80 hover:border-amber-300 font-bold text-xs sm:text-sm uppercase tracking-wider px-7 py-3.5 sm:px-8 sm:py-4 rounded-full backdrop-blur-md transition-all transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2 shadow-xl">
                     <i class="fa-solid fa-location-dot text-amber-400"></i> Ubicación
                 </a>
 
@@ -545,9 +555,7 @@
         </div>
     </section>
 
-    <!-- =========================================================
-         SECCIÓN EVENTOS (ADAPTADA DINÁMICAMENTE A MODO CLARO Y OSCURO)
-         ========================================================= -->
+    <!-- SECCIÓN EVENTOS -->
     <section id="eventos" class="relative z-10 py-24">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
@@ -607,10 +615,11 @@
                         Ubicación La Portada
                     </h2>
                     <p class="text-stone-600 dark:text-stone-300 text-base md:text-lg mb-8 leading-relaxed">
-                        Estamos ubicados en San José del Guaviare para atenderte con lo mejor de la panadería, heladería, asadero y restaurante. Haz tus pedidos directos o llámanos.
+                        Estamos ubicados en San José del Guaviare para atenderte con lo mejor de la panadería, heladería, asadero y restaurante. Haz tus pedidos directos o visítanos en nuestro punto principal.
                     </p>
 
                     <div class="space-y-4 mb-8">
+                        <!-- Llamada Telefónica -->
                         <a href="tel:+573213294659" class="flex items-center gap-4 p-4 rounded-2xl glass-clean hover:scale-[1.02] transition-all group block">
                             <div class="w-12 h-12 rounded-xl bg-brand-red/15 text-brand-red group-hover:bg-brand-red group-hover:text-white transition-colors flex items-center justify-center text-xl">
                                 <i class="fa-solid fa-phone"></i>
@@ -648,8 +657,11 @@
                     </a>
                 </div>
 
+                <!-- =========================================================
+                     MAPA PROFESIONAL EN COLOR CON RELIEVE Y TOPOGRAFÍA (ESRI TOPO)
+                     ========================================================= -->
                 <div class="lg:col-span-6">
-                    <div class="rounded-3xl overflow-hidden shadow-xl border-2 border-white dark:border-amber-500/20 h-[420px] relative">
+                    <div class="rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-500/30 dark:border-amber-500/20 h-[440px] relative bg-stone-100 dark:bg-stone-900">
                         <div id="map" class="w-full h-full z-10"></div>
                     </div>
                 </div>
@@ -799,9 +811,6 @@
             const isDark = html.classList.contains('dark');
             localStorage.setItem('color-theme', isDark ? 'dark' : 'light');
             updateThemeIcon(isDark);
-            if (window.switchMapTile) {
-                window.switchMapTile(isDark);
-            }
         });
 
         // ScrollSpy Fluido
@@ -858,49 +867,60 @@
             document.getElementById(id).classList.add('hidden');
         }
 
-        // Mapa Leaflet con CartoDB Tiles
+        // =========================================================
+        // MAPA LEAFLET: CAPA TOPOGRÁFICA EN COLOR VIVO CON RELIEVE Y CONTROL DE CAPAS
+        // =========================================================
         document.addEventListener('DOMContentLoaded', () => {
             const lat = 2.5711632;
             const lng = -72.6443025;
+
             const map = L.map('map', {
                 scrollWheelZoom: false
             }).setView([lat, lng], 17);
 
-            const lightTiles = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-            const darkTiles = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-
-            const isDark = document.getElementById('html-root').classList.contains('dark');
-            let currentTileLayer = L.tileLayer(isDark ? darkTiles : lightTiles, {
-                attribution: '&copy; <a href="https://carto.com/">CARTO</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-                subdomains: 'abcd',
-                maxZoom: 20
+            // Capa Topográfica Oficial de Esri: Relieve sombreado, curvas, ríos, carreteras y color vivo (Sin API Key)
+            const topoMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, increment P Corp., GEBCO, USGS, FAO, NPS, NRCAN, GeoBase, IGN, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community',
+                maxZoom: 19
             }).addTo(map);
 
-            window.switchMapTile = function(darkMode) {
-                map.removeLayer(currentTileLayer);
-                currentTileLayer = L.tileLayer(darkMode ? darkTiles : lightTiles, {
-                    attribution: '&copy; CARTO &copy; OpenStreetMap',
-                    subdomains: 'abcd',
-                    maxZoom: 20
-                }).addTo(map);
-            };
+            // Capa Satelital Híbrida alternativa (para alternar si el cliente desea ver las instalaciones reales)
+            const satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+                maxZoom: 19
+            });
 
+            // Control superior derecho para alternar mapa
+            L.control.layers({
+                "Relieve y Calles (Color)": topoMap,
+                "Vista Satélite": satelliteMap
+            }, null, { position: 'topright' }).addTo(map);
+
+            // Pin personalizado animado de La Portada
             const customIcon = L.divIcon({
                 className: 'custom-icon',
-                html: `<div style="background:#D92323; width:44px; height:44px; border-radius:50%; border:3px solid white; display:flex; align-items:center; justify-content:center; color:white; font-size:18px; box-shadow:0 8px 20px rgba(217,35,35,0.45); cursor:pointer;"><i class="fa-solid fa-utensils"></i></div>`,
-                iconSize: [44, 44],
-                iconAnchor: [22, 22]
+                html: `
+                    <div style="position:relative; width:48px; height:48px; display:flex; align-items:center; justify-content:center;">
+                        <span style="position:absolute; width:48px; height:48px; border-radius:50%; background:rgba(217,35,35,0.4); animation:ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;"></span>
+                        <div style="position:relative; background:#D92323; width:42px; height:42px; border-radius:50%; border:3px solid white; display:flex; align-items:center; justify-content:center; color:white; font-size:18px; box-shadow:0 8px 25px rgba(217,35,35,0.6); cursor:pointer;">
+                            <i class="fa-solid fa-utensils"></i>
+                        </div>
+                    </div>
+                `,
+                iconSize: [48, 48],
+                iconAnchor: [24, 24]
             });
 
             L.marker([lat, lng], { icon: customIcon }).addTo(map)
                 .bindPopup(`
-                    <div style="font-family:'Plus Jakarta Sans',sans-serif; text-align:center; padding:4px;">
-                        <strong style="font-size:14px; color:#D92323; display:block; margin-bottom:2px;">Restaurante y Asadero La Portada</strong>
-                        <span style="font-size:12px; color:#555;">San José del Guaviare</span><br>
-                        <a href="tel:+573213294659" style="display:inline-block; margin-top:6px; font-weight:800; font-size:12px; color:#D92323;">
+                    <div style="font-family:'Plus Jakarta Sans',sans-serif; text-align:center; padding:6px 2px;">
+                        <span style="display:inline-block; font-size:10px; font-weight:800; background:#FDE68A; color:#854D0E; padding:2px 8px; border-radius:12px; margin-bottom:4px; text-transform:uppercase;">Punto Principal</span>
+                        <strong style="font-size:15px; color:#D92323; display:block; line-height:1.2; margin-bottom:3px;">Restaurante y Asadero La Portada</strong>
+                        <span style="font-size:12px; color:#444; font-weight:500;">San José del Guaviare</span><br>
+                        <a href="tel:+573213294659" style="display:inline-block; margin-top:8px; font-weight:800; font-size:12px; color:#D92323; text-decoration:none; background:#FEE2E2; padding:4px 12px; border-radius:20px;">
                             <i class="fa-solid fa-phone"></i> 321 329 4659
                         </a><br>
-                        <a href="https://share.google/aFsJLswzARNx5DqyV" target="_blank" style="display:inline-block; margin-top:4px; font-weight:700; font-size:11px; color:#EA580C; text-decoration:underline;">
+                        <a href="https://share.google/aFsJLswzARNx5DqyV" target="_blank" style="display:inline-block; margin-top:6px; font-weight:700; font-size:11px; color:#EA580C; text-decoration:underline;">
                             Ver en Google Maps
                         </a>
                     </div>
