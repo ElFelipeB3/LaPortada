@@ -143,31 +143,47 @@
             color: #FFFFFF !important;
         }
 
-        /* HERO ULTRA-RESPONSIVE */
+        /* HERO AJUSTADO SIN RECORTES */
         .hero-video-container {
             position: relative;
             width: 100%;
             min-height: 100vh;
-            min-height: 100svh; /* viewport seguro en móviles */
+            min-height: 100svh;
             overflow: hidden;
             background-color: #0D0907;
         }
 
-        .hero-video {
+        /* Capa de video difuminado de fondo para móvil */
+        .hero-video-blur {
             position: absolute;
             inset: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center center;
+            filter: blur(28px) brightness(0.5);
+            transform: scale(1.15);
             z-index: 1;
-            filter: contrast(1.05) brightness(0.96);
         }
 
-        @media (max-width: 640px) {
-            .hero-video {
+        /* Video principal visible */
+        .hero-video-main {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* En móvil se ve 100% completo sin recortes laterales */
+            object-position: center center;
+            z-index: 2;
+            filter: contrast(1.05) brightness(0.98);
+        }
+
+        /* En pantallas medianas y de escritorio, cubre toda la pantalla panorámica */
+        @media (min-width: 768px) {
+            .hero-video-blur {
+                display: none;
+            }
+            .hero-video-main {
                 object-fit: cover;
-                object-position: 50% 50%;
             }
         }
 
@@ -175,9 +191,9 @@
             position: absolute;
             inset: 0;
             background: 
-                linear-gradient(180deg, rgba(13, 9, 7, 0.75) 0%, rgba(13, 9, 7, 0.3) 25%, rgba(13, 9, 7, 0.3) 65%, rgba(13, 9, 7, 0.9) 100%),
-                radial-gradient(circle at 50% 50%, transparent 20%, rgba(13, 9, 7, 0.6) 85%, rgba(13, 9, 7, 0.95) 100%);
-            z-index: 2;
+                linear-gradient(180deg, rgba(13, 9, 7, 0.75) 0%, rgba(13, 9, 7, 0.15) 25%, rgba(13, 9, 7, 0.25) 70%, rgba(13, 9, 7, 0.95) 100%),
+                radial-gradient(circle at 50% 50%, transparent 35%, rgba(13, 9, 7, 0.4) 80%, rgba(13, 9, 7, 0.9) 100%);
+            z-index: 3;
             pointer-events: none;
         }
 
@@ -292,12 +308,16 @@
         <a href="#contacto" class="mobile-link block px-4 py-3 rounded-2xl font-semibold text-stone-700 dark:text-stone-300 text-sm"><i class="fa-solid fa-location-dot mr-2 text-amber-600"></i> Ubicación</a>
     </div>
 
-    <!-- =========================================================
-         HERO ULTRA-RESPONSIVE (ADAPTADO A MÓVILES Y PANTALLAS GRANDES)
-         ========================================================= -->
+    <!-- HERO SECTION SIN RECORTE -->
     <section id="inicio" class="hero-video-container flex flex-col justify-between items-center px-4 sm:px-6 lg:px-8">
         
-        <video autoplay muted loop playsinline class="hero-video">
+        <!-- Video desenfocado de fondo (llena los bordes en móviles de forma estética) -->
+        <video autoplay muted loop playsinline class="hero-video-blur" aria-hidden="true">
+            <source src="inicio.mp4" type="video/mp4">
+        </video>
+
+        <!-- Video frontal con encuadre completo -->
+        <video autoplay muted loop playsinline class="hero-video-main">
             <source src="inicio.mp4" type="video/mp4">
             Tu navegador no soporta videos HTML5.
         </video>
@@ -311,10 +331,10 @@
             </div>
         </div>
 
-        <!-- CENTRO DESPEJADO PARA VISUALIZACIÓN COMPLETA DEL VIDEO / LOGO -->
+        <!-- CENTRO DESPEJADO PARA VISUALIZACIÓN COMPLETA -->
         <div class="relative z-10 w-full min-h-[140px] sm:min-h-[220px] flex-grow pointer-events-none"></div>
 
-        <!-- Parte Inferior: Botones Optimizados para Móvil y Desktop -->
+        <!-- Parte Inferior: Botones -->
         <div class="relative z-10 w-full max-w-3xl text-center pb-8 sm:pb-14">
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 px-2">
                 
@@ -657,9 +677,7 @@
                     </a>
                 </div>
 
-                <!-- =========================================================
-                     MAPA PROFESIONAL EN COLOR CON RELIEVE Y TOPOGRAFÍA (ESRI TOPO)
-                     ========================================================= -->
+                <!-- MAPA TOPOGRÁFICO EN COLOR CON RELIEVE -->
                 <div class="lg:col-span-6">
                     <div class="rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-500/30 dark:border-amber-500/20 h-[440px] relative bg-stone-100 dark:bg-stone-900">
                         <div id="map" class="w-full h-full z-10"></div>
@@ -867,9 +885,7 @@
             document.getElementById(id).classList.add('hidden');
         }
 
-        // =========================================================
-        // MAPA LEAFLET: CAPA TOPOGRÁFICA EN COLOR VIVO CON RELIEVE Y CONTROL DE CAPAS
-        // =========================================================
+        // Mapa Topográfico
         document.addEventListener('DOMContentLoaded', () => {
             const lat = 2.5711632;
             const lng = -72.6443025;
@@ -878,25 +894,21 @@
                 scrollWheelZoom: false
             }).setView([lat, lng], 17);
 
-            // Capa Topográfica Oficial de Esri: Relieve sombreado, curvas, ríos, carreteras y color vivo (Sin API Key)
             const topoMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, increment P Corp., GEBCO, USGS, FAO, NPS, NRCAN, GeoBase, IGN, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community',
+                attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
                 maxZoom: 19
             }).addTo(map);
 
-            // Capa Satelital Híbrida alternativa (para alternar si el cliente desea ver las instalaciones reales)
             const satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+                attribution: 'Tiles &copy; Esri',
                 maxZoom: 19
             });
 
-            // Control superior derecho para alternar mapa
             L.control.layers({
                 "Relieve y Calles (Color)": topoMap,
                 "Vista Satélite": satelliteMap
             }, null, { position: 'topright' }).addTo(map);
 
-            // Pin personalizado animado de La Portada
             const customIcon = L.divIcon({
                 className: 'custom-icon',
                 html: `
